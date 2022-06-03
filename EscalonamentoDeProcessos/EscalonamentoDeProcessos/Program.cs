@@ -1,117 +1,153 @@
 ﻿using EscalonamentoDeProcessos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-var processoLista = new List<Processos>();
+Main();
 
-Console.WriteLine("Bem vindo ao Programa de Escalonamento de processos! :)");
-Console.WriteLine("--------------------------//--------------------------");
-
-Console.WriteLine("Qual técnica você deseja utilizar?");
-Console.WriteLine("1 - Técnica FIFO(First In First Out)");
-Console.WriteLine("2 - Técnica Menor Processo");
-Console.WriteLine("3 - Técnica Prioridades");
-Console.WriteLine("4 - Técnica Round Robin(Ciclos)");
-
-int tecnica = Convert.ToInt32(Console.ReadLine());
-
-Console.WriteLine("Parar de inserir processos e obter o resultado, digite !");
-Console.WriteLine("Digite aqui seus Processos: ");
-
-do
+void Main()
 {
-    var processo = new Processos();
-    Console.Write("Processo: ");
-    processo.Nome = Console.ReadLine();
-    if (!Continuar(processo.Nome))
-        break;
 
-    Console.Write("Tempo total do processo (ms): ");
-    var resposta = Console.ReadLine();
-    if (!Continuar(resposta))
-        break;
-    processo.Tempo = Convert.ToInt32(resposta);
+    var processoLista = new List<Processos>();
+    Console.WriteLine("Bem vindo ao Programa de Escalonamento de processos! :)");
+    Console.WriteLine("--------------------------//--------------------------");
 
-    if (tecnica == 3)
+    Console.WriteLine("Qual técnica você deseja utilizar?");
+    Console.WriteLine("1 - Técnica FIFO(First In First Out)");
+    Console.WriteLine("2 - Técnica Menor Processo");
+    Console.WriteLine("3 - Técnica Prioridades");
+    Console.WriteLine("4 - Técnica Round Robin(Ciclos)");
+    Console.WriteLine("5 - Técnica  Múltiplas Filas");
+
+    int tecnica = Convert.ToInt32(Console.ReadLine()); //Captura a tecnica desejada pelo usuário convertendo em inteiro
+
+    Console.WriteLine("Parar de inserir processos e obter o resultado,  apenas deixe o campo em branco");
+    Console.WriteLine("Digite aqui seus Processos: ");
+
+    do
     {
-        //Console.Write("Prioridade: ");
-        //processo.Prioridade = Convert.ToInt32(Console.ReadLine());
-        //var resposta = Console.ReadLine();
-        //if (!Continuar(resposta))
-        //    break;
-        //processo.Tempo = Convert.ToInt32(resposta);
+        var processo = new Processos(); // Instancia um novo objeto do tipo Processos
+        Console.Write("Processo: ");
+        processo.Nome = Console.ReadLine(); // Leitura propriedade Nome
+        if (String.IsNullOrEmpty(processo.Nome))
+            break;
+
+        Console.Write("Tempo total do processo (ms): ");
+
+        var tempo = Console.ReadLine();
+
+        if (String.IsNullOrEmpty(tempo))
+            break;
+
+        processo.Tempo = Convert.ToInt32(tempo);
+
+
+        if (tecnica == 3 || tecnica == 5)
+        {
+            Console.Write("Prioridade: ");
+            var prioridade = Console.ReadLine();
+            if (String.IsNullOrEmpty(prioridade))
+                break;
+
+            processo.Prioridade = Convert.ToInt32(prioridade);
+        }
+
+        if (tecnica == 5)
+        {
+            Console.Write("Tipo da Fila: ");
+            Console.WriteLine("***Tipos de filas existentes, escolha uma por favor***");
+            Console.WriteLine("1 - Técnica FIFO(First In First Out)");
+            Console.WriteLine("2 - Técnica Menor Processo");
+            Console.WriteLine("3 - Técnica Prioridades");
+            Console.WriteLine("4 - Técnica Round Robin(Ciclos)");
+
+            processo.TipoFila = Convert.ToInt32(Console.ReadLine());
+
+        }
+
+        processoLista.Add(processo);
+        Console.Write("\n");
+
+    } while (true);
+
+    //Switch case, executa determinada função de acordo com a tecnica desejada
+    switch (tecnica)
+    {
+        case 1:
+            Fifo(processoLista);
+            break;
+        case 2:
+            MenorProcesso(processoLista);
+            break;
+        case 3:
+            Prioridades(processoLista);
+            break;
+        case 4:
+            RoundRobin(processoLista);
+            break;
+        default:
+            Console.WriteLine("Valor incorreto, tente novamente :)");
+            break;
     }
 
-    processoLista.Add(processo);
-
-
-} while (true);
-
-switch (tecnica)
-{
-    case 1:
-        Fifo();
-        break;
-    case 2:
-        MenorProcesso();
-        break;
-    case 3:
-        Prioridades();
-        break;
-    case 4:
-        RoundRobin();
-        break;
-    default:
-        Console.WriteLine("Valor incorreto, tente novamente :)");
-        break;
+    Console.WriteLine("\n---------------------//----------------------\n");
+    Main();
 }
 
 
-void Fifo()
+void Fifo(List<Processos> processoLista)
 {
-    var tempos = Tempos();
+    var tempos = Tempos(processoLista);
 
-    DiagramaGannt(tempos);
+    DiagramaGannt(tempos, processoLista);
     TempoDeEsperaMedio(tempos);
     TempoMedioDeProcessamento(tempos);
 }
 
-void MenorProcesso()
+void MenorProcesso(List<Processos> processoLista)
 {
-    BubbleSortAscendingTempo();
-    var tempos = Tempos();
+    BubbleSortAscendingTempo(processoLista);
+    var tempos = Tempos(processoLista);
 
-    DiagramaGannt(tempos);
+    DiagramaGannt(tempos, processoLista);
     TempoDeEsperaMedio(tempos);
     TempoMedioDeProcessamento(tempos);
 }
 
-void Prioridades()
+void Prioridades(List<Processos> processoLista)
 {
-    BubbleSortDescendingPrioridade();
-    var tempos = Tempos();
+    BubbleSortDescendingPrioridade(processoLista);
+    var tempos = Tempos(processoLista);
 
-    DiagramaGannt(tempos);
+    DiagramaGannt(tempos, processoLista);
     TempoDeEsperaMedio(tempos);
     TempoMedioDeProcessamento(tempos);
 }
 
-void RoundRobin()
+
+void RoundRobin(List<Processos> processoLista)
 {
-    Console.WriteLine("Escreva o Quantum (ms): ");
-    var quantum = Convert.ToInt32(Console.ReadLine());
+    Console.Write("Escreva o Quantum (ms): ");
+    string quantumValue = Console.ReadLine();
+    if (String.IsNullOrEmpty(quantumValue))
+        Main();
 
-    var tempos = Temposx();
+    var quantum = Convert.ToInt32(quantumValue);
 
-    var x = new List<Processos>();
+    var tempos = Temposx(processoLista);
 
-        var controleTempo = 1;
+    var aux = new List<Processos>();
+
+    int controleTempo = 1;
+
     while (processoLista.Count != 0)
     {
         for (int i = 0; i < processoLista.Count; i++)
         {
             Processos result = null;
-            if (x.Count > 0)
+            if (aux.Count > 0)
             {
-                result = x.Last();
+                result = aux.Last();
             }
 
             var pTemp = new Processos();
@@ -150,25 +186,27 @@ void RoundRobin()
                 controleTempo++;
                 i--;
             }
-
-
-            x.Add(pTemp);
-
-
-
+            aux.Add(pTemp);
         }
     }
 
-    foreach (var item in x)
+    var temposProcessos = new int[aux.Count];
+    for (int i = 0; i < aux.Count; i++)
     {
-        Console.WriteLine(item);
+        foreach (var item in aux)
+        {
+            temposProcessos[i] = item.Tempo;
+        }
     }
 
+    DiagramaGannt(temposProcessos, processoLista);
+    TempoDeEsperaMedio(temposProcessos);
+    TempoMedioDeProcessamento(temposProcessos);
 }
 
 ///////////////////////////////////////////////////////////
 
-void DiagramaGannt(int[] tempos)
+void DiagramaGannt(int[] tempos, List<Processos> processoLista)
 {
     int quebraDeLinha = 0;
 
@@ -217,9 +255,11 @@ void DiagramaGannt(int[] tempos)
     //    }
     //}
     Console.WriteLine("\n");
+
+
 }
 
-void BubbleSortAscendingTempo()
+void BubbleSortAscendingTempo(List<Processos> processoLista)
 {
     for (int i = (processoLista.Count - 1); i >= 0; i--)
     {
@@ -235,7 +275,7 @@ void BubbleSortAscendingTempo()
     }
 }
 
-void BubbleSortDescendingPrioridade()
+void BubbleSortDescendingPrioridade(List<Processos> processoLista)
 {
     for (int i = (processoLista.Count - 1); i >= 0; i--)
     {
@@ -251,7 +291,7 @@ void BubbleSortDescendingPrioridade()
     }
 }
 
-int[] Tempos()
+int[] Tempos(List<Processos> processoLista)
 {
     int[] tempos = new int[processoLista.Count + 1];
 
@@ -264,7 +304,7 @@ int[] Tempos()
     return tempos;
 }
 
-int[] Temposx()
+int[] Temposx(List<Processos> processoLista)
 {
     int[] tempos = new int[processoLista.Count + 1];
 
@@ -275,7 +315,9 @@ int[] Temposx()
     return tempos;
 }
 
-
+/// <summary>
+/// Verifica se o usuário deseja continuar adicionando Processos
+/// </summary>
 bool Continuar(string resposta)
 {
     if (resposta == "!")
@@ -285,8 +327,12 @@ bool Continuar(string resposta)
     return true;
 }
 
+/// <summary>
+/// 
+/// </summary>
 double TempoDeEsperaMedio(int[] tempos)
 {
+
     double TEM = 0;
     for (int i = 0; i < tempos.Length - 1; i++)
     {
@@ -295,6 +341,34 @@ double TempoDeEsperaMedio(int[] tempos)
     TEM = TEM / (tempos.Length - 1);
     Console.WriteLine($"Tempo de espera médio: {TEM}(ms)");
     return TEM;
+}
+
+void CalculoTempoMedioRoundRobin(int[] tempos, int quantum)
+{
+    var temposFinal =  new Array[quantum];
+    for (int i = 0; i < tempos.Length; i++)
+    {
+        var temp = tempos[i];
+        var mod = (temp % quantum);
+        var qtdProcessos = (temp - mod);
+        qtdProcessos = qtdProcessos / quantum;
+        if (mod > 0)
+        {
+            qtdProcessos++;
+        }
+    }
+
+    for (int i = 0; i < tempos.Length; i++)
+    {
+        var temp = tempos[i];
+        var mod = (temp % quantum);
+        var qtdProcessos = (temp - mod);
+        qtdProcessos =  qtdProcessos / quantum;
+        if (mod > 0)
+        {
+            qtdProcessos++;
+        }
+    }
 }
 
 double TempoMedioDeProcessamento(int[] tempos)
