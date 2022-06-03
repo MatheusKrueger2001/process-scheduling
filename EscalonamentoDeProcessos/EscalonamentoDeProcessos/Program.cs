@@ -346,29 +346,38 @@ double TempoDeEsperaMedio(int[] tempos)
 void CalculoTempoMedioRoundRobin(int[] tempos, int quantum)
 {
     var temposFinal =  new Array[quantum];
-    for (int i = 0; i < tempos.Length; i++)
-    {
-        var temp = tempos[i];
-        var mod = (temp % quantum);
-        var qtdProcessos = (temp - mod);
-        qtdProcessos = qtdProcessos / quantum;
-        if (mod > 0)
-        {
-            qtdProcessos++;
-        }
-    }
+    var mod = new Array[quantum];
+    int qtdAux = 0;
 
     for (int i = 0; i < tempos.Length; i++)
     {
-        var temp = tempos[i];
-        var mod = (temp % quantum);
-        var qtdProcessos = (temp - mod);
-        qtdProcessos =  qtdProcessos / quantum;
-        if (mod > 0)
-        {
-            qtdProcessos++;
+        var mod[] = (tempos[i] % quantum);
+        var temposFinal[] = (tempos[i] - mod);
+        var qtdAux = qtdAux + (temposFinal[i] / quantum);
+        if(mod[i] > 0) {
+          qtdAux++  
         }
+
     }
+
+    int somaMedia = 0
+    do {
+        for (int a = 0; a < tempos.Length, a++) 
+        {
+            var temposFinal[i] -= quantum; 
+            
+            if(temposFinal[i] == 0 && mod[i] > 0) {
+                somaMedia += mod[i]
+            } else if (temposFinal[i] > 0) {
+                somaMedia += quantum; 
+            }
+        }
+
+    var qtdAux--;
+    } while (qtdAux == 0);
+
+    var TMP = somaMedia / tempos.Length;
+    Console.WriteLine($"Tempo médio de processamento: {TMP}(ms)");
 }
 
 double TempoMedioDeProcessamento(int[] tempos)
