@@ -94,7 +94,6 @@ void Main()
     Main();
 }
 
-
 void Fifo(List<Processos> processoLista)
 {
     var tempos = Tempos(processoLista);
@@ -124,7 +123,6 @@ void Prioridades(List<Processos> processoLista)
     TempoMedioDeProcessamento(tempos);
 }
 
-
 void RoundRobin(List<Processos> processoLista)
 {
     Console.Write("Escreva o Quantum (ms): ");
@@ -138,11 +136,19 @@ void RoundRobin(List<Processos> processoLista)
 
     var aux = new List<Processos>();
 
+    var processoListaAux = new List<Processos>();
+    for (int i = 0; i < processoLista.Count; i++)
+    {
+        processoListaAux.Add(processoLista[i]);
+    }
+
+    //var processoListaAu = processoLista;
+
     int controleTempo = 1;
 
-    while (processoLista.Count != 0)
+    while (processoListaAux.Count != 0)
     {
-        for (int i = 0; i < processoLista.Count; i++)
+        for (int i = 0; i < processoListaAux.Count; i++)
         {
             Processos result = null;
             if (aux.Count > 0)
@@ -151,7 +157,7 @@ void RoundRobin(List<Processos> processoLista)
             }
 
             var pTemp = new Processos();
-            pTemp.Nome = processoLista[i].Nome;
+            pTemp.Nome = processoListaAux[i].Nome;
 
             if (tempos[i + controleTempo] >= quantum)
             {
@@ -159,7 +165,7 @@ void RoundRobin(List<Processos> processoLista)
 
                 if (tempos[i + controleTempo] == 0)
                 {
-                    processoLista.RemoveAt(i);
+                    processoListaAux.RemoveAt(i);
                     controleTempo++;
                     i--;
                 }
@@ -182,7 +188,7 @@ void RoundRobin(List<Processos> processoLista)
 
 
                 tempos[i + controleTempo] = 0;
-                processoLista.RemoveAt(i);
+                processoListaAux.RemoveAt(i);
                 controleTempo++;
                 i--;
             }
@@ -193,15 +199,12 @@ void RoundRobin(List<Processos> processoLista)
     var temposProcessos = new int[aux.Count];
     for (int i = 0; i < aux.Count; i++)
     {
-        foreach (var item in aux)
-        {
-            temposProcessos[i] = item.Tempo;
-        }
+        temposProcessos[i] = aux[i].Tempo;
     }
 
     DiagramaGannt(temposProcessos, processoLista);
     TempoDeEsperaMedio(temposProcessos);
-    TempoMedioDeProcessamento(temposProcessos);
+    CalculoTempoMedioRoundRobin(tempos, quantum);
 }
 
 ///////////////////////////////////////////////////////////
@@ -257,6 +260,31 @@ void DiagramaGannt(int[] tempos, List<Processos> processoLista)
     Console.WriteLine("\n");
 
 
+}
+
+double TempoDeEsperaMedio(int[] tempos)
+{
+
+    double TEM = 0;
+    for (int i = 0; i < tempos.Length - 1; i++)
+    {
+        TEM += tempos[i];
+    }
+    TEM = TEM / (tempos.Length - 1);
+    Console.WriteLine($"Tempo de espera médio: {TEM}(ms)");
+    return TEM;
+}
+
+double TempoMedioDeProcessamento(int[] tempos)
+{
+    double TMP = 0;
+    for (int i = 1; i < tempos.Length; i++)
+    {
+        TMP += tempos[i];
+    }
+    TMP = TMP / (tempos.Length - 1);
+    Console.WriteLine($"Tempo médio de processamento: {TMP}(ms)");
+    return TMP;
 }
 
 void BubbleSortAscendingTempo(List<Processos> processoLista)
@@ -315,79 +343,44 @@ int[] Temposx(List<Processos> processoLista)
     return tempos;
 }
 
-/// <summary>
-/// Verifica se o usuário deseja continuar adicionando Processos
-/// </summary>
-bool Continuar(string resposta)
-{
-    if (resposta == "!")
-    {
-        return false;
-    }
-    return true;
-}
-
-/// <summary>
-/// 
-/// </summary>
-double TempoDeEsperaMedio(int[] tempos)
-{
-
-    double TEM = 0;
-    for (int i = 0; i < tempos.Length - 1; i++)
-    {
-        TEM += tempos[i];
-    }
-    TEM = TEM / (tempos.Length - 1);
-    Console.WriteLine($"Tempo de espera médio: {TEM}(ms)");
-    return TEM;
-}
-
 void CalculoTempoMedioRoundRobin(int[] tempos, int quantum)
 {
-    var temposFinal =  new Array[quantum];
-    var mod = new Array[quantum];
+    int[] temposFinal = new int[quantum];
+    int[] mod = new int[quantum];
     int qtdAux = 0;
 
     for (int i = 0; i < tempos.Length; i++)
     {
-        var mod[] = (tempos[i] % quantum);
-        var temposFinal[] = (tempos[i] - mod);
-        var qtdAux = qtdAux + (temposFinal[i] / quantum);
-        if(mod[i] > 0) {
-          qtdAux++  
+        mod[i] = (tempos[i] % quantum);
+        temposFinal[i] = (tempos[i] - mod[i]);
+        qtdAux = qtdAux + (temposFinal[i] / quantum);
+        if (mod[i] > 0)
+        {
+            qtdAux++;
         }
 
     }
 
-    int somaMedia = 0
-    do {
-        for (int a = 0; a < tempos.Length, a++) 
+    int somaMedia = 0;
+    do
+    {
+        for (int a = 0; a < tempos.Length; a++)
         {
-            var temposFinal[i] -= quantum; 
-            
-            if(temposFinal[i] == 0 && mod[i] > 0) {
-                somaMedia += mod[i]
-            } else if (temposFinal[i] > 0) {
-                somaMedia += quantum; 
+            temposFinal[a] -= quantum;
+
+            if (temposFinal[a] == 0 && mod[a] > 0)
+            {
+                somaMedia += mod[a];
+            }
+            else if (temposFinal[a] > 0)
+            {
+                somaMedia += quantum;
             }
         }
 
-    var qtdAux--;
+        qtdAux--;
     } while (qtdAux == 0);
 
     var TMP = somaMedia / tempos.Length;
     Console.WriteLine($"Tempo médio de processamento: {TMP}(ms)");
-}
-
-double TempoMedioDeProcessamento(int[] tempos)
-{
-    double TMP = 0;
-    for (int i = 1; i < tempos.Length; i++)
-    {
-        TMP += tempos[i];
-    }
-    TMP = TMP / (tempos.Length - 1);
-    Console.WriteLine($"Tempo médio de processamento: {TMP}(ms)");
-    return TMP;
 }
