@@ -85,6 +85,9 @@ void Main()
         case 4:
             RoundRobin(processoLista);
             break;
+        case 5:
+            multiplasLinhas(processoLista);
+            break;
         default:
             Console.WriteLine("Valor incorreto, tente novamente :)");
             break;
@@ -205,6 +208,45 @@ void RoundRobin(List<Processos> processoLista)
     DiagramaGannt(temposProcessos, processoLista);
     TempoDeEsperaMedio(temposProcessos);
     CalculoTempoMedioRoundRobin(tempos, quantum);
+}
+
+
+void multiplasLinhas(List<Processos> processoLista) 
+{
+    
+    var processoListaFifo = new List<Processos>();
+    var processoListaMenorProcesso = new List<Processos>();
+    var processoListaPrioridades = new List<Processos>();
+    var processoListaRoundRobin = new List<Processos>();
+    var prioridadeFila = new List();
+
+    for (int a = 0; a < processoLista.Count; a++) {
+               
+        //Switch case, executa determinada função de acordo com a tecnica desejada
+        switch (processo[a].TipoFila)
+        {
+            case 1:
+                var processoListaFifo[a] = processo[a];
+                var prioridadeFila = processo[a].Prioridade;
+                break;
+            case 2:
+                var processoListaMenorProcesso[a] = processo[a];
+                var prioridadeFila = processo[a].Prioridade;
+                break;
+            case 3:
+                var processoListaPrioridades[a] = processo[a];
+                var prioridadeFila = processo[a].Prioridade;
+                break;
+            case 4:
+                var processoListaRoundRobin[a] = processo[a];
+                var prioridadeFila = processo[a].Prioridade;
+                break;
+            default:
+                var processoListaFifo[a] = processo[a];
+                var prioridadeFila = processo[a].Prioridade;
+                break;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////
